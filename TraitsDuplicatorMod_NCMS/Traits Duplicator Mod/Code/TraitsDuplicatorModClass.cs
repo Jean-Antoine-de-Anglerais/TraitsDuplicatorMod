@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using HarmonyLib;
 using ReflectionUtility;
 using System.Collections.Generic;
@@ -25,9 +25,13 @@ namespace TraitsDuplicatorMod_NCMS
 
             Localizer.Localization("en", "trait_editor_remove", "Trait Editor now removes traits from a creature");
             Localizer.Localization("ru", "trait_editor_remove", "Теперь редактор черт удаляет черты у существа");
+            Localizer.Localization("cz", "trait_editor_remove", "已切换为移除特质模式，点击特质可删除");
+            Localizer.Localization("ch", "trait_editor_remove", "已切換為移除特質模式，點擊特質可刪除");
 
             Localizer.Localization("en", "trait_editor_add", "Trait Editor now adds traits to the creature");
             Localizer.Localization("ru", "trait_editor_add", "Теперь редактор черт добавляет черты существу");
+            Localizer.Localization("cz", "trait_editor_add", "已切换为添加特质模式，点击特质可叠加");
+            Localizer.Localization("ch", "trait_editor_add", "已切換為添加特質模式，點擊特質可疊加");
 
             harmony.Patch(AccessTools.Method(typeof(TraitsWindow), "useTraitOnActor"),
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "useTraitOnActor_Prefix")));
@@ -108,7 +112,7 @@ namespace TraitsDuplicatorMod_NCMS
 
             templanguage = language;
 
-            if (templanguage != "ru" && templanguage != "en")
+            if (templanguage != "ru" && templanguage != "en" && templanguage != "cz" && templanguage != "ch")
             {
                 templanguage = "en";
             }
