@@ -1,0 +1,8 @@
+{
+  "name": "Traits Duplicator Mod",
+  "author": "Jean-Antoine d'Anglerais (le_ombre)",
+  "version": "1.3.0.0",
+  "targetGameBuild": 558,
+  "description": "This mod allows you to add and remove traits from creatures in unlimited quantities.",
+  "iconPath": "icon.png"
+}
