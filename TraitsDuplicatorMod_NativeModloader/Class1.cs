@@ -1,50 +1,94 @@
-﻿using BepInEx;
-using DG.Tweening;
+﻿using DG.Tweening;
 using HarmonyLib;
 using ReflectionUtility;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 
-namespace TraitsDuplicatorMod_NCMS
+namespace TraitsDuplicatorMod_NativeModloader
 {
-    public class TraitsDuplicatorModClass : BaseUnityPlugin
+    public class WorldBoxMod : MonoBehaviour
     {
-        public static Harmony harmony = new Harmony("jean.worldbox.mods.traitsduplicator");
-
-        public static void init()
+        public void Awake()
         {
-            foreach (var trait in AssetManager.traits.list)
+            Debug.Log("Traits Duplicator Mod loading...");
+            string path = Path.Combine(Application.streamingAssetsPath, "Mods");
+            path = Path.Combine(path, "stuffthatjeansmodsuse");
+            if (!Directory.Exists(path))
             {
-                trait.can_be_given = true;
-                trait.can_be_removed = true;
+                DirectoryInfo directoryInfo = new DirectoryInfo(path);
+                directoryInfo.Create();
+                directoryInfo.Attributes |= FileAttributes.Hidden;
             }
 
-            foreach (var actorAsset in AssetManager.actor_library.list)
-            {
-                actorAsset.can_edit_traits = true;
-                actorAsset.canBeInspected = true;
-            }
+            string text2 = Path.Combine(path, "Mono.Cecil.dll");
+            string text3 = Path.Combine(path, "0Harmony.dll");
+            string text4 = Path.Combine(path, "MonoMod.RuntimeDetour.dll");
+            string text5 = Path.Combine(path, "MonoMod.Utils.dll");
 
-            Localizer.Localization("en", "trait_editor_remove", "Trait Editor now removes traits from a creature");
-            Localizer.Localization("ru", "trait_editor_remove", "Теперь редактор черт удаляет черты у существа");
-            Localizer.Localization("cz", "trait_editor_remove", "已切换为移除特质模式，点击特质可删除");
-            Localizer.Localization("ch", "trait_editor_remove", "已切換為移除特質模式，點擊特質可刪除");
+            File.WriteAllBytes(text3, TraitsDuplicatorMod_NativeModloader.Properties.Resources._0Harmony);
+            File.WriteAllBytes(text2, TraitsDuplicatorMod_NativeModloader.Properties.Resources.Mono_Cecil);
+            File.WriteAllBytes(text4, TraitsDuplicatorMod_NativeModloader.Properties.Resources.MonoMod_Utils);
+            File.WriteAllBytes(text5, TraitsDuplicatorMod_NativeModloader.Properties.Resources.MonoMod_RuntimeDetour);
 
-            Localizer.Localization("en", "trait_editor_add", "Trait Editor now adds traits to the creature");
-            Localizer.Localization("ru", "trait_editor_add", "Теперь редактор черт добавляет черты существу");
-            Localizer.Localization("cz", "trait_editor_add", "已切换为添加特质模式，点击特质可叠加");
-            Localizer.Localization("ch", "trait_editor_add", "已切換為添加特質模式，點擊特質可疊加");
+            Assembly.LoadFrom(text3);
+            Assembly.LoadFrom(text2);
+            Assembly.LoadFrom(text4);
+            Assembly.LoadFrom(text5);
 
-            harmony.Patch(AccessTools.Method(typeof(TraitsWindow), "useTraitOnActor"),
-            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "useTraitOnActor_Prefix")));
-
-            harmony.Patch(AccessTools.Method(typeof(UiCreature), "click"),
-            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "click_Prefix")));
+            Debug.Log("Traits Duplicator Mod loaded!");
+            GameObject gameObject = new GameObject("TraitsDuplicatorMod_NativeModloader");
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            gameObject.AddComponent<Patches>();
         }
     }
 
-    public class Patches
+    internal class Patches : MonoBehaviour
     {
+        public static Harmony harmony = new Harmony("TraitsDuplicatorMod_NativeModloader");
+        private bool _initialized = false;
+
+        public void Update()
+        {
+            if (global::Config.gameLoaded)
+            {
+            }
+
+            if (global::Config.gameLoaded && !_initialized)
+            {
+                foreach (var trait in AssetManager.traits.list)
+                {
+                    trait.can_be_given = true;
+                    trait.can_be_removed = true;
+                }
+
+                foreach (var actorAsset in AssetManager.actor_library.list)
+                {
+                    actorAsset.can_edit_traits = true;
+                    actorAsset.canBeInspected = true;
+                }
+
+                Localizer.Localization("en", "trait_editor_remove", "Trait Editor now removes traits from a creature");
+                Localizer.Localization("ru", "trait_editor_remove", "Теперь редактор черт удаляет черты у существа");
+                Localizer.Localization("cz", "trait_editor_remove", "已切换为移除特质模式，点击特质可删除");
+                Localizer.Localization("ch", "trait_editor_remove", "已切換為移除特質模式，點擊特質可刪除");
+
+                Localizer.Localization("en", "trait_editor_add", "Trait Editor now adds traits to the creature");
+                Localizer.Localization("ru", "trait_editor_add", "Теперь редактор черт добавляет черты существу");
+                Localizer.Localization("cz", "trait_editor_add", "已切换为添加特质模式，点击特质可叠加");
+                Localizer.Localization("ch", "trait_editor_add", "已切換為添加特質模式，點擊特質可疊加");
+
+                harmony.Patch(AccessTools.Method(typeof(TraitsWindow), "useTraitOnActor"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "useTraitOnActor_Prefix")));
+
+                harmony.Patch(AccessTools.Method(typeof(UiCreature), "click"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "click_Prefix")));
+
+                _initialized = true;
+            }
+        }
+
         public static bool useTraitOnActor_Prefix(TraitsWindow __instance, ActorTrait pTrait)
         {
             Actor currentActor = (Actor)Reflection.CallMethod(__instance, "getCurrentActor");
@@ -118,11 +162,22 @@ namespace TraitsDuplicatorMod_NCMS
         public static bool addTrait(ActorBase instance, string pTrait, bool pRemoveOpposites = false)
         {
             var data = (ActorData)Reflection.GetField(instance.GetType(), instance, "data");
-
+            //if (instance.hasTrait(pTrait))
+            //{
+            //return false;
+            //}
             if (AssetManager.traits.get(pTrait) == null)
             {
                 return false;
             }
+            //if (pRemoveOpposites)
+            //{
+            //instance.removeOppositeTraits(pTrait);
+            //}
+            //if (instance.hasOppositeTrait(pTrait))
+            //{
+            //return false;
+            //}
 
             data.traits.Add(pTrait);
             instance.setStatsDirty();
@@ -131,7 +186,6 @@ namespace TraitsDuplicatorMod_NCMS
 
         public static bool isTraitRemoverOn = false;
     }
-
 
     public static class Localizer
     {
@@ -163,5 +217,3 @@ namespace TraitsDuplicatorMod_NCMS
         }
     }
 }
-
-
