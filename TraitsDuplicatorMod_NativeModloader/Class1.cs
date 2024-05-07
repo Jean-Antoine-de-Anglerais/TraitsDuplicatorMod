@@ -33,15 +33,15 @@ namespace TraitsDuplicatorMod_NativeModloader
             Assembly.LoadFrom(Path.Combine(path, "MonoMod.RuntimeDetour.dll"));
 
             Debug.Log("Traits Duplicator Mod loaded!");
-            GameObject gameObject = new GameObject("TraitsDuplicatorMod_NativeModloader");
+            GameObject gameObject = new GameObject(MethodBase.GetCurrentMethod().DeclaringType.Namespace);
             DontDestroyOnLoad(gameObject);
-            gameObject.AddComponent<Patches>();
+            gameObject.AddComponent<Main>();
         }
     }
 
-    internal class Patches : MonoBehaviour
+    internal class Main : MonoBehaviour
     {
-        public static Harmony harmony = new Harmony("TraitsDuplicatorMod_NativeModloader");
+        public static Harmony harmony = new Harmony(MethodBase.GetCurrentMethod().DeclaringType.Namespace);
         private bool _initialized = false;
 
         public void Update()
@@ -83,7 +83,10 @@ namespace TraitsDuplicatorMod_NativeModloader
                 _initialized = true;
             }
         }
+    }
 
+    public class Patches
+    {
         public static bool useTraitOnActor_Prefix(TraitsWindow __instance, ActorTrait pTrait)
         {
             Actor currentActor = (Actor)Reflection.CallMethod(__instance, "getCurrentActor");
