@@ -40,6 +40,9 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\DvarfBeerMod\Beer Box\bin\Debug\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="DOTween">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\worldbox\worldbox_Data\Managed\DOTween.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
