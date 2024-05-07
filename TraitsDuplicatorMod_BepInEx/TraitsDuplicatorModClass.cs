@@ -1,9 +1,7 @@
 ﻿using BepInEx;
-using BepInEx.Configuration;
 using HarmonyLib;
 using ReflectionUtility;
 using System.Collections.Generic;
-using UnityEngine;
 using static ConstantNamespace.ConstantClass;
 
 namespace TraitsDuplicatorMod_BepInEx
@@ -14,16 +12,8 @@ namespace TraitsDuplicatorMod_BepInEx
         public static Harmony harmony = new Harmony(pluginName);
         private bool _initialized = false;
 
-        public static ConfigEntry<KeyCode> DefaultButton;
-
         public void Awake()
         {
-            DefaultButton = Config.Bind("General",      // The section under which the option is shown
-                                         "Traits Editor Switch Key",  // The key of the configuration option in the configuration file
-                                         KeyCode.F1, // The default value
-                                         "Sets a key that will toggle the trait editor into add mode or remove mode"); // Description of the option to show in the config file
-
-
             Logger.LogMessage("ХООООООООЙ");
         }
 
@@ -40,19 +30,6 @@ namespace TraitsDuplicatorMod_BepInEx
         {
             if (global::Config.gameLoaded)
             {
-                if (Input.GetKeyDown(DefaultButton.Value))
-                {
-                    StaticStuff.isTraitRemoverOn = !StaticStuff.isTraitRemoverOn;
-
-                    if (StaticStuff.isTraitRemoverOn)
-                    {
-                        WorldTip.showNow("trait_editor_remove", true, "top", 1f);
-                    }
-                    else if (!StaticStuff.isTraitRemoverOn)
-                    {
-                        WorldTip.showNow("trait_editor_add", true, "top", 1f);
-                    }
-                }
             }
 
             if (global::Config.gameLoaded && !_initialized)

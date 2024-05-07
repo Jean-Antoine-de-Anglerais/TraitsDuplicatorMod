@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using NCMS;
+﻿using NCMS;
+using UnityEngine;
 
 namespace TraitsDuplicatorMod_NCMS
 {
