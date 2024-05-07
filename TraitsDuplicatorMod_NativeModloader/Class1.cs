@@ -22,24 +22,19 @@ namespace TraitsDuplicatorMod_NativeModloader
                 directoryInfo.Attributes |= FileAttributes.Hidden;
             }
 
-            string text2 = Path.Combine(path, "Mono.Cecil.dll");
-            string text3 = Path.Combine(path, "0Harmony.dll");
-            string text4 = Path.Combine(path, "MonoMod.RuntimeDetour.dll");
-            string text5 = Path.Combine(path, "MonoMod.Utils.dll");
+            File.WriteAllBytes(Path.Combine(path, "0Harmony.dll"), Properties.Resources._0Harmony);
+            File.WriteAllBytes(Path.Combine(path, "Mono.Cecil.dll"), Properties.Resources.Mono_Cecil);
+            File.WriteAllBytes(Path.Combine(path, "MonoMod.Utils.dll"), Properties.Resources.MonoMod_Utils);
+            File.WriteAllBytes(Path.Combine(path, "MonoMod.RuntimeDetour.dll"), Properties.Resources.MonoMod_RuntimeDetour);
 
-            File.WriteAllBytes(text3, TraitsDuplicatorMod_NativeModloader.Properties.Resources._0Harmony);
-            File.WriteAllBytes(text2, TraitsDuplicatorMod_NativeModloader.Properties.Resources.Mono_Cecil);
-            File.WriteAllBytes(text4, TraitsDuplicatorMod_NativeModloader.Properties.Resources.MonoMod_Utils);
-            File.WriteAllBytes(text5, TraitsDuplicatorMod_NativeModloader.Properties.Resources.MonoMod_RuntimeDetour);
-
-            Assembly.LoadFrom(text3);
-            Assembly.LoadFrom(text2);
-            Assembly.LoadFrom(text4);
-            Assembly.LoadFrom(text5);
+            Assembly.LoadFrom(Path.Combine(path, "0Harmony.dll"));
+            Assembly.LoadFrom(Path.Combine(path, "Mono.Cecil.dll"));
+            Assembly.LoadFrom(Path.Combine(path, "MonoMod.Utils.dll"));
+            Assembly.LoadFrom(Path.Combine(path, "MonoMod.RuntimeDetour.dll"));
 
             Debug.Log("Traits Duplicator Mod loaded!");
             GameObject gameObject = new GameObject("TraitsDuplicatorMod_NativeModloader");
-            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
             gameObject.AddComponent<Patches>();
         }
     }
